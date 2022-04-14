@@ -1,0 +1,6 @@
+.cpcache
+.shadow-cljs
+.clj-kondo
+.lsp
+.projectile
+resources/unpacked/out

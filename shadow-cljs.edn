@@ -1,0 +1,25 @@
+{:nrepl {:port 8777}
+ :deps true
+
+ :dev-http {8020 "public"}
+
+ :builds
+ {:extension {:target :chrome-extension
+              :extension-dir "resources/unpacked"
+              :manifest-file "resources/unpacked/manifest.edn"
+              :compiler-options
+              {:closure-output-charset "US-ASCII"
+               :source-map-inline true}
+
+              :outputs {:background {:output-type :chrome/background
+                                     :entries [lamb.background]}
+
+                        :content-script {:output-type :chrome/content-script
+                                         :chrome/options {:matches ["<all_urls>"]
+                                                          :run-at "document_end"}
+                                         :entries [lamb.content-script]}
+
+                        :popup {:output-type :chrome/shared
+                                :entries [lamb.popup]}}}}}
+
+

@@ -1,0 +1,14 @@
+{
+  "name": "chromex-sample-shadow",
+  "version": "1.0.0",
+  "description": "chromex example working with shadow-cljs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+  },
+  "dependencies": {}
+}
