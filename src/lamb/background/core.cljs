@@ -2,66 +2,24 @@
   (:require [goog.string :as gstring]
             [goog.string.format]
             [cljs.core.async :refer [go-loop <! >! chan go]]
-            [chromex.logging :refer-macros [log info warn error
-                                            group group-end]]
+            [chromex.logging :refer-macros [log]]
             [chromex.chrome-event-channel :as ec]
-            [chromex.protocols.chrome-port :as cp]
             [chromex.ext.tabs :as tabs]
             [chromex.ext.runtime :as runtime]
             [lamb.background.storage :as storage]
-            [chromex.ext.context-menus :as cm]
-            [clojure.string :as string]))
-
-(def clients (atom []))
-
-(defn add-client! [client]
-  (log "BACKGROUND: client connected " (cp/get-sender client))
-  (swap! clients conj client))
-
-(defn remove-client! [client]
-  (log "BACKGROUND: client disconnected " (cp/get-sender client))
-  (let [remove-item (fn [coll item] (remove #(identical? item %) coll))]
-    (swap! clients remove-item client)))
-
-(defn run-client-message-loop! [client]
-  (log "BACKGROUND: starting event loop for client: " (cp/get-sender client))
-  (go-loop []
-    (when-some [message (<! client)]
-      (log "BACKGROUND: got client message: " message "from " (cp/get-sender client))
-      (recur))
-    (log "BACKGROUND: leaving event loop for client: " (cp/get-sender client))
-    (remove-client! client)))
-
-(defn handle-client-connection! [client]
-  (add-client! client)
-  (cp/post-message! client "hello from BACKGROUND PAGE!")
-  (run-client-message-loop! client))
-
-(defn tell-clients-about-new-tab! []
-  (doseq [client @clients]
-    (cp/post-message! client "a new tab was created")))
+            [lamb.background.selection :as selection]
+            [chromex.ext.context-menus :as cm]))
 
 (defn get-caller-tab! []
   (let [query (clj->js {:active true :lastFocusedWindow true})
-        return (chan)]
+        output (chan)]
     (go
       (while true
         (let [tabs (<! (tabs/query query))]
-          (>! return (-> tabs first first .-id)))))
+          (>! output (-> tabs first first .-id)))))
+    output))
 
-    return))
-
-(defn split-selection-text [text]
-  (string/split text #"\r?\n" -1))
-
-(defn make-node [text]
-  {:id (random-uuid)
-   :text text})
-
-(defn rebuild-text [text-items]
-  (reduce #(str %1 "\n" %2) "" text-items))
-
-(defn execute-script! [tab-id]
+(defn execute-selection! [tab-id]
   (let [out-chan (chan)
         script (clj->js {:code "window.getSelection().toString()"})]
     (go
@@ -69,19 +27,20 @@
         (>! out-chan result)))
     out-chan))
 
-(defn get-selection []
-  (go
-    (let [a (<! (get-caller-tab!))
-          b (<! (execute-script! a))
-          res (split-selection-text (first (flatten (js->clj b))))]
-       ;; (log a)
-      (.log js/console res)
-      (.log js/console (rebuild-text res)))))
+(defn save-selection!! []
+  (go (let [tab-id (<! (get-caller-tab!))
+            selection-text (<! (execute-selection! tab-id))
+            today (selection/get-date)
+            current-day (<! (storage/get-data! today))
+            current-highlights (get (js->clj current-day) today)]
+        (selection/handle-today-save! {:current-highlights (js->clj current-highlights)
+                                       :selection-text selection-text
+                                       :current-date today}))))
 
 (defn handle-context-click [event-args]
   (let [menu-id (-> event-args first .-menuItemId)]
     (if (= menu-id "my-exit-ev")
-      (get-selection)
+      (save-selection!!)
       nil)))
 
 (defn process-chrome-event [event-num event]
@@ -90,8 +49,6 @@
   (log (first event))
   (let [[event-id event-args] event]
     (case event-id
-      ::runtime/on-connect (apply handle-client-connection! event-args)
-      ::tabs/on-created (tell-clients-about-new-tab!)
       ::cm/on-clicked (handle-context-click event-args)
       nil)))
 
@@ -112,8 +69,6 @@
 
 (defn init! []
   (log "BACKGROUND: init")
-  (storage/test-storage!)
-  (log ::cm/on-cliked)
   (cm/create (clj->js {:title "my-ext-dev"
                        :id "my-exit-ev"
                        :contexts ["all"]}))
