@@ -1,8 +1,8 @@
 (ns lamb.popup.core
   (:require [cljs.core.async :refer [go-loop <!]]
-            [chromex.logging :refer-macros [log info warn error group group-end]]
+            [chromex.logging :refer-macros [log]]
             [chromex.protocols.chrome-port :refer [post-message!]]
-            [chromex.ext.runtime :as runtime :refer-macros [connect]]))
+            [chromex.ext.runtime :as runtime]))
 
 ; -- a message loop ---------------------------------------------------------------------------------------------------------
 

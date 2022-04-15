@@ -11,8 +11,10 @@
         output (chan)]
     (go
       (while true
-        (let [tabs (<! (tabs/query query))]
-          (>! output (-> tabs first first .-id)))))
+        (let [tabs (<! (tabs/query query))
+              current-tab (-> tabs first first)]
+          (>! output {:tab-id (.-id current-tab)
+                      :url (.-url current-tab)}))))
     output))
 
 (defn execute-selection! [tab-id]
@@ -24,14 +26,15 @@
     out-chan))
 
 (defn save-selection!! []
-  (go (let [tab-id (<! (get-caller-tab!))
-            selection-text (<! (execute-selection! tab-id))
+  (go (let [tab (<! (get-caller-tab!))
+            selection-text (<! (execute-selection! (:tab-id tab)))
             today (selection/get-date)
             current-day (<! (storage/get-data! today))
             current-highlights (get (js->clj current-day) today)]
         (selection/handle-today-save! {:current-highlights (js->clj current-highlights)
                                        :selection-text selection-text
-                                       :current-date today}))))
+                                       :current-date today
+                                       :url (:url tab)}))))
 
 (defn handle-context-click [event-args]
   (let [menu-id (-> event-args first .-menuItemId)]
