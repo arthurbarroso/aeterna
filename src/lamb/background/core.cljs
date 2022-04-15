@@ -35,11 +35,12 @@
 
 (defn handle-context-click [event-args]
   (let [menu-id (-> event-args first .-menuItemId)]
-    (if (= menu-id "my-exit-ev")
+    (if (= menu-id "lamb")
       (save-selection!!)
       nil)))
 
 (defn process-chrome-event [event]
+  (.log js/console event)
   (let [[event-id event-args] event]
     (case event-id
       ::cm/on-clicked (handle-context-click event-args)
@@ -57,7 +58,7 @@
     (run-chrome-event-loop! chrome-event-channel)))
 
 (defn init! []
-  (cm/create (clj->js {:title "my-ext-dev"
-                       :id "my-exit-ev"
-                       :contexts ["all"]}))
+  (cm/create (clj->js {:title "lamb - save selection"
+                       :id "lamb"
+                       :contexts ["selection"]}))
   (boot-chrome-event-loop!))

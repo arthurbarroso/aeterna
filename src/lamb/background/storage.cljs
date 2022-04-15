@@ -1,6 +1,5 @@
 (ns lamb.background.storage
   (:require [cljs.core.async :refer [go <! >! chan]]
-            [chromex.logging :refer-macros [log]]
             [chromex.protocols.chrome-storage-area :as sa]
             [chromex.ext.storage :as storage]))
 
