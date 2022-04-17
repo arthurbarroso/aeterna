@@ -1,4 +1,4 @@
-(ns lamb.background.storage
+(ns aeterna.background.storage
   (:require [cljs.core.async :refer [go <! >! chan]]
             [chromex.protocols.chrome-storage-area :as sa]
             [chromex.ext.storage :as storage]))

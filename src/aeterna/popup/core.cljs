@@ -1,4 +1,4 @@
-(ns lamb.popup.core
+(ns aeterna.popup.core
   (:require [cljs.core.async :refer [go <!]]
             [chromex.ext.runtime :as runtime]))
 

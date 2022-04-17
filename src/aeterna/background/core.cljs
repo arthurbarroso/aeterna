@@ -1,9 +1,9 @@
-(ns lamb.background.core
+(ns aeterna.background.core
   (:require [cljs.core.async :refer [go-loop <! >! chan go]]
             [chromex.chrome-event-channel :as ec]
             [chromex.ext.tabs :as tabs]
-            [lamb.background.storage :as storage]
-            [lamb.background.selection :as selection]
+            [aeterna.background.storage :as storage]
+            [aeterna.background.selection :as selection]
             [chromex.ext.context-menus :as cm]
             [chromex.ext.runtime :as runtime]))
 
@@ -77,7 +77,7 @@
     (run-chrome-event-loop! chrome-event-channel)))
 
 (defn init! []
-  (cm/create (clj->js {:title "lamb - save selection"
-                       :id "lamb"
+  (cm/create (clj->js {:title "aeterna - save selection"
+                       :id "aeterna"
                        :contexts ["selection"]}))
   (boot-chrome-event-loop!))

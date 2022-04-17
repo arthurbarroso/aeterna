@@ -12,14 +12,12 @@
                :source-map-inline true}
 
               :outputs {:background {:output-type :chrome/background
-                                     :entries [lamb.background]}
+                                     :entries [aeterna.background]}
 
                         :content-script {:output-type :chrome/content-script
                                          :chrome/options {:matches ["<all_urls>"]
                                                           :run-at "document_end"}
-                                         :entries [lamb.content-script]}
+                                         :entries [aeterna.content-script]}
 
                         :popup {:output-type :chrome/shared
-                                :entries [lamb.popup]}}}}}
-
-
+                                :entries [aeterna.popup]}}}}}

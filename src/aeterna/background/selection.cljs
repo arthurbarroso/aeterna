@@ -1,5 +1,5 @@
-(ns lamb.background.selection
-  (:require [lamb.background.storage :as storage]
+(ns aeterna.background.selection
+  (:require [aeterna.background.storage :as storage]
             [cljs.core.async :refer [go <!]]))
 
 (defn make-node [text-block url]
