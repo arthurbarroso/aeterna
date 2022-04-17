@@ -1,28 +1,21 @@
 (ns aeterna.popup.core
   (:require [cljs.core.async :refer [go <!]]
-            [chromex.ext.runtime :as runtime]))
+            [chromex.ext.runtime :as runtime]
+            [aeterna.popup.ui :as ui]))
 
-(defn extract-dates [msg-data]
+(defn extract-dates
+  "Expects the `fetch-all` message's response. Accesses it's `data`
+  property, makes it into a `clojure` map and then extracts it's keys"
+  [msg-data]
   (-> msg-data
       .-data
       js->clj
       keys))
 
-(defn create-date-element [date list-container]
-  (let [li (.createElement js/document "li")]
-    (.setAttribute li "id" date)
-    (set! (.-innerText li) date)
-    (.appendChild list-container li)))
-
-(defn create-date-list [dates]
-  (let [list-container (.getElementById js/document "aeterna-dates")]
-    (doseq [date dates]
-      (create-date-element date list-container))))
-
 (defn show-dates [data]
   (-> data
       extract-dates
-      create-date-list))
+      ui/create-date-list))
 
 (defn init! []
   (.log js/console "popup")
@@ -30,5 +23,4 @@
                        "fhdfoojfkpncfhhckochchojlddplhmg"
                        "fetch-all"))]
         (.log js/console "message: " msg)
-        (show-dates msg)))
-  (.log js/console "POPUP: init"))
+        (show-dates msg))))

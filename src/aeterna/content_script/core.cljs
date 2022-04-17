@@ -1,6 +1,6 @@
 (ns aeterna.content-script.core
-  (:require [cljs.core.async :refer [go-loop <!]]
-            [chromex.protocols.chrome-port :refer [post-message!]]
-            [chromex.ext.runtime :as runtime]))
+  "This file must remain as is. Removing it or removing the require
+  makes `popup` unable to call `runtime`"
+  (:require [chromex.ext.runtime :as runtime]))
 
 (defn init! [])
