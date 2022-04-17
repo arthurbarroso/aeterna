@@ -1,7 +1,6 @@
 (ns aeterna.popup.core
   (:require [cljs.core.async :refer [go <!]]
-            [chromex.ext.runtime :as runtime]
-            [clojure.walk :as walk]))
+            [chromex.ext.runtime :as runtime]))
 
 (defn extract-dates [msg-data]
   (-> msg-data
