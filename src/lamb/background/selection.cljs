@@ -1,5 +1,6 @@
 (ns lamb.background.selection
-  (:require [lamb.background.storage :as storage]))
+  (:require [lamb.background.storage :as storage]
+            [cljs.core.async :refer [go <!]]))
 
 (defn make-node [text-block url]
   {(random-uuid) {:contents text-block
@@ -30,3 +31,8 @@
                          (append-to-highlights
                           current-highlights
                           parsed-text)))))
+
+(defn handle-highlights-fetching! [send-response]
+  (go (let [data (<! (storage/get-all-data!))]
+        (.log js/console "handled-highlight: " data)
+        (send-response (clj->js {:data data})))))

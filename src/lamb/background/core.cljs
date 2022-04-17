@@ -43,14 +43,15 @@
       (save-selection!!)
       nil)))
 
-(defn handle-fetch-all! [args]
+(defn handle-fetch-all! [send-response]
   (do (.log js/console "fetch all event received...")
-      (.log js/console args)))
+      (.log js/console send-response)
+      (selection/handle-highlights-fetching! send-response)))
 
 (defn handle-popup-call [event-args]
-  (let [[event-type _sender event-data] event-args]
+  (let [[event-type _sender send-response] event-args]
     (case event-type
-      "fetch-all" (handle-fetch-all! event-data)
+      "fetch-all" (handle-fetch-all! send-response)
       (.log js/console "couldn't detect type of event..."))))
 
 (defn process-chrome-event [event]
