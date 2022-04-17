@@ -4,7 +4,8 @@
             [chromex.ext.tabs :as tabs]
             [lamb.background.storage :as storage]
             [lamb.background.selection :as selection]
-            [chromex.ext.context-menus :as cm]))
+            [chromex.ext.context-menus :as cm]
+            [chromex.ext.runtime :as runtime]))
 
 (defn get-caller-tab! []
   (let [query (clj->js {:active true :lastFocusedWindow true})
@@ -42,11 +43,23 @@
       (save-selection!!)
       nil)))
 
+(defn handle-fetch-all! [args]
+  (do (.log js/console "fetch all event received...")
+      (.log js/console args)))
+
+(defn handle-popup-call [event-args]
+  (let [[event-type _sender event-data] event-args]
+    (case event-type
+      "fetch-all" (handle-fetch-all! event-data)
+      (.log js/console "couldn't detect type of event..."))))
+
 (defn process-chrome-event [event]
-  (.log js/console event)
+  (.log js/console "event on background: " event)
   (let [[event-id event-args] event]
+    (.log js/console "event on background, id: " event-id)
     (case event-id
       ::cm/on-clicked (handle-context-click event-args)
+      ::runtime/on-message (handle-popup-call event-args)
       nil)))
 
 (defn run-chrome-event-loop! [chrome-event-channel]
@@ -57,7 +70,9 @@
 
 (defn boot-chrome-event-loop! []
   (let [chrome-event-channel (ec/make-chrome-event-channel (chan))]
+    (tabs/tap-all-events chrome-event-channel)
     (cm/tap-on-clicked-events chrome-event-channel)
+    (runtime/tap-all-events chrome-event-channel)
     (run-chrome-event-loop! chrome-event-channel)))
 
 (defn init! []
