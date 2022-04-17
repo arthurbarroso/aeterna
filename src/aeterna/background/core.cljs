@@ -26,7 +26,7 @@
         (>! out-chan result)))
     out-chan))
 
-(defn save-selection!! []
+(defn save-selection! []
   (go (let [tab (<! (get-caller-tab!))
             selection-text (<! (execute-selection! (:tab-id tab)))
             today (selection/get-date)
@@ -40,7 +40,7 @@
 (defn handle-context-click [event-args]
   (let [menu-id (-> event-args first .-menuItemId)]
     (if (= menu-id "aeterna")
-      (save-selection!!)
+      (save-selection!)
       nil)))
 
 (defn handle-fetch-all! [send-response]
