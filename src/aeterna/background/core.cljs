@@ -39,7 +39,7 @@
 
 (defn handle-context-click [event-args]
   (let [menu-id (-> event-args first .-menuItemId)]
-    (if (= menu-id "lamb")
+    (if (= menu-id "aeterna")
       (save-selection!!)
       nil)))
 

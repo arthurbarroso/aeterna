@@ -1,6 +1,6 @@
 {:name             "aeterna"
  :version          "1.0"
- :description      "This example project is using shadow-cljs"
+ :description      "Aterna :)"
  :manifest-version 2
 
  :permissions      ["activeTab"

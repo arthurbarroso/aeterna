@@ -1,0 +1,32 @@
+body {
+		margin: 0;
+		outline: 0;
+		padding: 0;
+		-webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* font-family "'Roboto', sans-serif" */
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+ul {
+		padding: 0;
+		margin: 0;
+}
+
+li {
+		padding: 0;
+		margin: 0;
+}
+
+.aeterna-container {
+		width: 200px;
+		height: 200px;
+		display: flex;
+		flex-direction: column;
+		padding: 2%;
+}
+
+.aeterna-container ul li {
+		list-style: none;
+}
