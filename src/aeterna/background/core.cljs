@@ -7,6 +7,9 @@
             [chromex.ext.context-menus :as cm]
             [chromex.ext.runtime :as runtime]))
 
+(defn open-contents-tab []
+  (tabs/create (clj->js {:url "contents.html"})))
+
 (defn get-caller-tab! []
   (let [query (clj->js {:active true :lastFocusedWindow true})
         output (chan)]
@@ -52,6 +55,7 @@
   (let [[event-type _sender send-response] event-args]
     (case event-type
       "fetch-all" (handle-fetch-all! send-response)
+      "open-contents" (open-contents-tab)
       (.log js/console "couldn't detect type of event..."))))
 
 (defn process-chrome-event [event]
