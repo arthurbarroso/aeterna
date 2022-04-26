@@ -4,18 +4,20 @@
             [chromex.ext.runtime :as runtime]))
 
 (defn handle-set-data! [msg-data]
-  (.log js/console msg-data))
+  (cljs.pprint/pprint msg-data))
 
 (defn handle-popup-call [event-args]
-  (let [[event-type _sender send-response] event-args]
+  (let [[edata _sender send-response] event-args
+        event-data (js->clj edata)
+        event-type (get event-data "action")
+        msg-data (get event-data "data")]
     (case event-type
-      "set-data" (handle-set-data! event-args)
+      "set-data" (handle-set-data! msg-data)
       (.log js/console "couldn't detect type of event..."))))
 
 (defn process-chrome-event [event]
-  (.log js/console "event on background visualizerr: " event)
   (let [[event-id event-args] event]
-    (.log js/console "event on background, id: " event-id)
+    (.log js/console "[visualizer]: event id:" event-id)
     (case event-id
       ::runtime/on-message (handle-popup-call event-args)
       nil)))
@@ -27,6 +29,7 @@
       (recur))))
 
 (defn init! []
+  (.log js/console "eiiita..")
   (let [chrome-event-channel (ec/make-chrome-event-channel (chan))]
     (runtime/tap-all-events chrome-event-channel)
     (run-chrome-event-loop! chrome-event-channel)))
