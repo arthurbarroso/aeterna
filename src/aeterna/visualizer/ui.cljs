@@ -1,21 +1,25 @@
-(ns aeterna.visualizer.ui)
+(ns aeterna.visualizer.ui
+  (:require [clojure.walk :as walk]))
 
 (defn mount-title [date]
   (let [title-container (.getElementById js/document "viewing-date")]
     (set! (.-innerText title-container) date)))
 
-(defn mount-visualization [])
-
-(defn create-date-element
-  "Creates an `li` element containing a date. Appends it as a
-  list-container's child."
-  [date list-container]
-  (let [li (.createElement js/document "li")]
-    (.setAttribute li "id" date)
-    (set! (.-innerText li) date)
+(defn create-quote-element
+  [quote list-container]
+  (let [{:keys [contents url]} (walk/keywordize-keys (first (vals quote)))
+        uuid (first (keys quote))
+        li (.createElement js/document "li")
+        quote-content (.createElement js/document "p")
+        quote-site (.createElement js/document "a")]
+    (.setAttribute li "id" uuid)
+    (set! (.-innerText quote-site) url)
+    (set! (.-innerText quote-content) contents)
+    (.appendChild li quote-content)
+    (.appendChild li quote-site)
     (.appendChild list-container li)))
 
-(defn create-date-list [dates]
-  (let [list-container (.getElementById js/document "aeterna-dates")]
-    (doseq [date dates]
-      (create-date-element date list-container))))
+(defn mount-visualization [quotes]
+  (let [list-container (.getElementById js/document "aeterna-contents")]
+    (doseq [quote quotes]
+      (create-quote-element quote list-container))))

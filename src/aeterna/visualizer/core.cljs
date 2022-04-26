@@ -1,11 +1,14 @@
 (ns aeterna.visualizer.core
   (:require [cljs.core.async :refer [go-loop <! >! chan go]]
             [chromex.chrome-event-channel :as ec]
-            [chromex.ext.runtime :as runtime]))
+            [chromex.ext.runtime :as runtime]
+            [aeterna.visualizer.ui :as ui]))
 
 (defn handle-set-data! [msg-data]
-  (cljs.pprint/pprint (js->clj msg-data)))
-  ;; (doall (map #(cljs.pprint/pprint {:item  %}) (vals msg-data))))
+  (let [selected-date (-> msg-data keys first)
+        selected-quotes (vals msg-data)]
+    (ui/mount-title selected-date)
+    (ui/mount-visualization (flatten selected-quotes))))
 
 (defn handle-popup-call [event-args]
   (let [[edata _sender send-response] event-args
