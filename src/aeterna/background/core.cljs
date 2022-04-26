@@ -7,8 +7,27 @@
             [chromex.ext.context-menus :as cm]
             [chromex.ext.runtime :as runtime]))
 
+(defn get-tab-status [tab]
+  (get tab "status"))
+
+(defn wait-for-tab! [tab-id]
+  (let [output (chan)]
+    (go-loop []
+      (let [[tab] (<! (tabs/get tab-id))
+            tab-status (-> tab js->clj get-tab-status)]
+        (if (= tab-status "complete")
+          (>! output true)
+          (recur))))
+    output))
+
 (defn open-contents-tab []
-  (tabs/create (clj->js {:url "contents.html"})))
+  (go
+    (let [[tab] (<! (tabs/create (clj->js {:url "contents.html"})))
+          tab-id (.-id tab)
+          _tab-status (<! (wait-for-tab! tab-id))]
+      (.log js/console {:tab (js->clj tab) :tab-id tab-id})
+      (tabs/send-message tab-id (clj->js {:action "set-data"
+                                          :data {:something "oi"}})))))
 
 (defn get-caller-tab! []
   (let [query (clj->js {:active true :lastFocusedWindow true})

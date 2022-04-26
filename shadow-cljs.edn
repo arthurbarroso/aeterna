@@ -20,4 +20,7 @@
                                          :entries [aeterna.content-script]}
 
                         :popup {:output-type :chrome/shared
-                                :entries [aeterna.popup]}}}}}
+                                :entries [aeterna.popup]}
+
+                        :visualizer {:output-type :chrome/shared
+                                     :entries [aeterna.visualizer]}}}}}
