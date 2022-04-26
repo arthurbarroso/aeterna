@@ -19,7 +19,7 @@ li {
 		margin: 0;
 }
 
-.aeterna-container {
+.aeterna-popup-container {
 		width: 200px;
 		height: 200px;
 		display: flex;
@@ -27,6 +27,16 @@ li {
 		padding: 2%;
 }
 
-.aeterna-container ul li {
+.aeterna-popup-container ul li {
 		list-style: none;
 }
+
+.aeterna-contents {
+	max-width: 60%;
+	width: 60%;
+}
+
+.aeterna-visualization-container {
+	padding: 2%;
+}
+

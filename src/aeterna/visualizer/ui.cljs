@@ -11,12 +11,15 @@
         uuid (first (keys quote))
         li (.createElement js/document "li")
         quote-content (.createElement js/document "p")
-        quote-site (.createElement js/document "a")]
+        quote-site (.createElement js/document "p")
+        site-link (.createElement js/document "a")]
     (.setAttribute li "id" uuid)
-    (set! (.-innerText quote-site) url)
+    (set! (.-innerText quote-site) "From: ")
     (set! (.-innerText quote-content) contents)
-    (.appendChild li quote-content)
+    (set! (.-innerText site-link) url)
+    (.appendChild quote-site site-link)
     (.appendChild li quote-site)
+    (.appendChild li quote-content)
     (.appendChild list-container li)))
 
 (defn mount-visualization [quotes]

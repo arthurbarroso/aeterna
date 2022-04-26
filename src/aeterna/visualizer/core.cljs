@@ -11,7 +11,7 @@
     (ui/mount-visualization (flatten selected-quotes))))
 
 (defn handle-popup-call [event-args]
-  (let [[edata _sender send-response] event-args
+  (let [[edata _sender _send-response] event-args
         event-data (js->clj edata)
         event-type (get event-data "action")
         msg-data (get event-data "data")]
