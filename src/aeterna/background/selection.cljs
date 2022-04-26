@@ -7,7 +7,8 @@
                   :url url}})
 
 (defn append-to-highlights [todays-highlights highlight-to-append]
-  (merge todays-highlights highlight-to-append))
+  (let [values (vals todays-highlights)]
+    (merge values highlight-to-append)))
 
 (defn parse-text [selection-text url]
   (-> selection-text
@@ -25,6 +26,8 @@
                                   current-date
                                   url]}]
   (let [parsed-text (parse-text selection-text url)]
+    (.log js/console {:parsed-text  parsed-text
+                      :current-highlights (js->clj current-highlights)})
     (if (empty? (js->clj current-highlights))
       (storage/set-data! current-date parsed-text)
       (storage/set-data! current-date

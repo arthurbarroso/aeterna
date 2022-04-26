@@ -4,7 +4,8 @@
             [chromex.ext.runtime :as runtime]))
 
 (defn handle-set-data! [msg-data]
-  (cljs.pprint/pprint msg-data))
+  (cljs.pprint/pprint (js->clj msg-data)))
+  ;; (doall (map #(cljs.pprint/pprint {:item  %}) (vals msg-data))))
 
 (defn handle-popup-call [event-args]
   (let [[edata _sender send-response] event-args
