@@ -5,7 +5,8 @@
             [aeterna.background.storage :as storage]
             [aeterna.background.selection :as selection]
             [chromex.ext.context-menus :as cm]
-            [chromex.ext.runtime :as runtime]))
+            [chromex.ext.runtime :as runtime]
+            [clojure.walk :as walk]))
 
 (defn get-tab-status [tab]
   (get tab "status"))
@@ -20,14 +21,14 @@
           (recur))))
     output))
 
-(defn open-contents-tab []
+(defn open-contents-tab [msg-date]
   (go
     (let [[tab] (<! (tabs/create (clj->js {:url "contents.html"})))
           tab-id (.-id tab)
-          _tab-status (<! (wait-for-tab! tab-id))]
-      (.log js/console {:tab (js->clj tab) :tab-id tab-id})
+          _tab-status (<! (wait-for-tab! tab-id))
+          msg-highlights (<! (storage/get-data! msg-date))]
       (tabs/send-message tab-id (clj->js {:action "set-data"
-                                          :data {:something "oi"}})))))
+                                          :data msg-highlights})))))
 
 (defn get-caller-tab! []
   (let [query (clj->js {:active true :lastFocusedWindow true})
@@ -52,9 +53,8 @@
   (go (let [tab (<! (get-caller-tab!))
             selection-text (<! (execute-selection! (:tab-id tab)))
             today (selection/get-date)
-            current-day (<! (storage/get-data! today))
-            current-highlights (get (js->clj current-day) today)]
-        (selection/handle-today-save! {:current-highlights (js->clj current-highlights)
+            current-day (<! (storage/get-data! today))]
+        (selection/handle-today-save! {:current-highlights (js->clj current-day)
                                        :selection-text selection-text
                                        :current-date today
                                        :url (:url tab)}))))
@@ -67,18 +67,19 @@
 
 (defn handle-fetch-all! [send-response]
   (do (.log js/console "fetch all event received...")
-      (.log js/console send-response)
       (selection/handle-highlights-fetching! send-response)))
 
 (defn handle-popup-call [event-args]
-  (let [[event-type _sender send-response] event-args]
-    (case event-type
+  (let [[event-data _sender send-response] event-args]
+    (.log js/console "gets past subtype.. ")
+    (case event-data
       "fetch-all" (handle-fetch-all! send-response)
-      "open-contents" (open-contents-tab)
-      (.log js/console "couldn't detect type of event..."))))
+      (let [{:keys [action data]} (walk/keywordize-keys (js->clj event-data))]
+        (if (= "open-contents" action)
+          (open-contents-tab data)
+          (.log js/console "couldn't detect type of event..."))))))
 
 (defn process-chrome-event [event]
-  (.log js/console "event on background: " event)
   (let [[event-id event-args] event]
     (.log js/console "event on background, id: " event-id)
     (case event-id

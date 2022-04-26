@@ -2,11 +2,11 @@
   (:require [chromex.ext.runtime :as runtime]
             [aeterna.config :as config]))
 
-(defn check-date-contents []
+(defn check-date-contents [date]
   (.log js/console "-> check date contents")
   (runtime/send-message
    (:extension-id config/config)
-   "open-contents"))
+   (clj->js {:action "open-contents" :data date})))
 
 (defn create-date-element
   "Creates an `li` element containing a date. Appends it as a
@@ -15,7 +15,7 @@
   (let [li (.createElement js/document "li")]
     (.setAttribute li "id" date)
     (set! (.-innerText li) date)
-    (.addEventListener li "click" #(check-date-contents))
+    (.addEventListener li "click" #(check-date-contents date))
     (.appendChild list-container li)))
 
 (defn create-date-list [dates]
